@@ -5,6 +5,7 @@ import os
 import random
 import json
 import aiohttp
+from keep_alive import keep_alive
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -44,6 +45,7 @@ async def start_command(message: types.Message):
         "Я бот, который помогает получить полезные материалы по ключевым словам.\n"
         "Напиши ключевое слово из видео на нашем YouTube-канале.\n"
         f"Если ты не подписан на канал {CHANNEL_USERNAME}, я попрошу тебя подписаться.\n"
+        "Например, попробуй слово: девушка или промокод."
     )
     await message.answer(text)
 

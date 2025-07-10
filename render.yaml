@@ -5,11 +5,16 @@ services:
     plan: free
     region: oregon
     runtime: python
-    pythonVersion: 3.11.9
-    buildCommand: pip install -r requirements.txt
+    pythonVersion: 3.11
+    buildCommand: pip install --no-cache-dir -r requirements.txt
     startCommand: python bot.py
     envVars:
-      - key: PORT
-        value: 8080
       - key: PYTHON_VERSION
-        value: 3.11.9
+        sync: false
+        value: 3.11
+      - key: PORT
+        sync: false
+        value: 8080
+      - key: API_TOKEN
+        sync: false
+        value: 8163482962:AAFpdGrhJdGqTcklXAl93zSglXmK26hDTOg

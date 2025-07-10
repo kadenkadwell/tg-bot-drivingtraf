@@ -1,13 +1,18 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
+from aiogram.filters import Command, Text
 import logging
 import os
 import random
 from keep_alive import keep_alive
 
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+
+# Получение токена из переменной окружения
 API_TOKEN = os.getenv('API_TOKEN')
 CHANNEL_USERNAME = '@drivingtraf'
 
+# Словарь ключевых слов
 KEYWORDS = {
     'девушка': {'path': 'mainphoto.webp', 'caption': 'Вот твой файл!'},
     'traffic2025': {
@@ -16,12 +21,12 @@ KEYWORDS = {
     }
 }
 
-logging.basicConfig(level=logging.INFO)
-
+# Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
-async def check_subscription(user_id):
+async def check_subscription(user_id: int) -> bool:
+    """Проверка, подписан ли пользователь на канал."""
     try:
         member = await bot.get_chat_member(chat_id=CHANNEL_USERNAME, user_id=user_id)
         return member.status in ['creator', 'administrator', 'member']
@@ -29,8 +34,9 @@ async def check_subscription(user_id):
         logging.warning(f"Ошибка проверки подписки: {e}")
         return False
 
-@dp.message_handler(commands=['start', 'help'])
+@dp.message(Command(commands=['start', 'help']))
 async def send_welcome(message: types.Message):
+    """Обработчик команд /start и /help."""
     text = (
         "Привет! 👋\n\n"
         "Я бот, который помогает получить полезные материалы по ключевым словам.\n"
@@ -40,8 +46,9 @@ async def send_welcome(message: types.Message):
     )
     await message.answer(text)
 
-@dp.message_handler(content_types=types.ContentType.TEXT)
+@dp.message(Text)
 async def keyword_handler(message: types.Message):
+    """Обработчик текстовых сообщений с ключевыми словами."""
     if message.text.startswith('/'):
         return
 
@@ -52,7 +59,8 @@ async def keyword_handler(message: types.Message):
             data = KEYWORDS[keyword]
             if data['path'] and os.path.exists(data['path']):
                 try:
-                    await message.answer_document(open(data['path'], 'rb'), caption=data['caption'])
+                    with open(data['path'], 'rb') as file:
+                        await message.answer_document(file, caption=data['caption'])
                 except Exception as e:
                     logging.error(f"Ошибка отправки файла: {e}")
                     await message.answer("Извините, возникла ошибка при отправке файла. Попробуйте позже.")
@@ -75,4 +83,4 @@ async def keyword_handler(message: types.Message):
 
 if __name__ == '__main__':
     keep_alive()
-    executor.start_polling(dp, skip_updates=True)
+    dp.run_polling(bot)

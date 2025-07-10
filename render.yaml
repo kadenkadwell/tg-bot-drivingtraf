@@ -6,7 +6,7 @@ services:
     region: oregon
     pythonVersion: 3.13
     buildCommand: pip install --no-cache-dir -r requirements.txt
-    startCommand: python bot.py
+    startCommand: python bot.py & gunicorn -w 2 -b 0.0.0.0:8080 keep_alive:app
     envVars:
       - key: PORT
         value: 8080

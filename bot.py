@@ -4,8 +4,7 @@ import logging
 import os
 import random
 from keep_alive import keep_alive
-
-API_TOKEN = '8163482962:AAFpdGrhJdGqTcklXAl93zSglXmK26hDTOg'
+API_TOKEN = os.getenv('API_TOKEN')
 CHANNEL_USERNAME = '@drivingtraf'
 
 KEYWORDS = {

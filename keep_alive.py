@@ -22,13 +22,15 @@ ADMIN_TEMPLATE = '''
         li { padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; }
         .delete-btn { background: #dc3545; }
         .delete-btn:hover { background: #c82333; }
+        .note { color: #555; font-size: 0.9em; }
     </style>
 </head>
 <body>
     <h1>Управление промокодами</h1>
     <form method="POST" action="/admin">
         <input type="text" name="keyword" placeholder="Ключевое слово" required>
-        <input type="text" name="path" placeholder="Путь к файлу (или оставьте пустым)">
+        <input type="text" name="path" placeholder="Путь к файлу или URL (например, https://example.com/image.png)">
+        <p class="note">Оставьте путь пустым для ответа только текстом. Используйте URL для изображений или файлов.</p>
         <textarea name="caption" placeholder="Текст ответа" required></textarea>
         <button type="submit">Добавить промокод</button>
     </form>
@@ -36,7 +38,7 @@ ADMIN_TEMPLATE = '''
     <ul>
         {% for keyword, data in keywords.items() %}
         <li>
-            <strong>{{ keyword }}</strong>: {{ data.caption }} (Файл: {{ data.path or 'Нет' }})
+            <strong>{{ keyword }}</strong>: {{ data.caption }} (Файл/URL: {{ data.path or 'Нет' }})
             <form method="POST" action="/admin/delete" style="display:inline;">
                 <input type="hidden" name="keyword" value="{{ keyword }}">
                 <button class="delete-btn" type="submit">Удалить</button>

@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
+from aiogram.utils.executor import start_polling
 import logging
 import os
 import random
@@ -76,4 +76,4 @@ async def keyword_handler(message: types.Message):
 
 if __name__ == '__main__':
     keep_alive()
-    executor.start_polling(dp, skip_updates=True)
+    start_polling(dp, skip_updates=True)

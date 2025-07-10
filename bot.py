@@ -3,6 +3,7 @@ from aiogram.filters import Command
 import logging
 import os
 import random
+import json
 from keep_alive import keep_alive
 
 # Настройка логирования
@@ -12,14 +13,14 @@ logging.basicConfig(level=logging.INFO)
 API_TOKEN = os.getenv('API_TOKEN')
 CHANNEL_USERNAME = '@drivingtraf'  # Замените на '@grindingtraffic', если канал другой
 
-# Словарь ключевых слов
-KEYWORDS = {
-    'девушка': {'path': 'mainphoto.webp', 'caption': 'Вот твой файл!'},
-    'traffic2025': {
-        'path': None,
-        'caption': 'Спасибо за промокод, держи "Чек-лист для проверки seo-кейсов"!\nhttps://docs.google.com/spreadsheets/d/15OGc_BBkT-H_f-3Iy4Zccvj2j2rLXgm9hiiGX45CU0A/edit?usp=sharing'
-    }
-}
+# Чтение ключевых слов из JSON-файла
+def load_keywords():
+    try:
+        with open('keywords.json', 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        logging.error(f"Ошибка загрузки keywords.json: {e}")
+        return {}
 
 # Инициализация бота и диспетчера
 bot = Bot(token=API_TOKEN)
@@ -43,6 +44,7 @@ async def start_command(message: types.Message):
         "Я бот, который помогает получить полезные материалы по ключевым словам.\n"
         "Напиши ключевое слово из видео на нашем YouTube-канале.\n"
         f"Если ты не подписан на канал {CHANNEL_USERNAME}, я попрошу тебя подписаться.\n"
+        "Например, попробуй слово: девушка или промокод."
     )
     await message.answer(text)
 
@@ -53,10 +55,11 @@ async def keyword_handler(message: types.Message):
         return
 
     keyword = message.text.lower().strip()
-    if keyword in KEYWORDS:
+    keywords = load_keywords()
+    if keyword in keywords:
         is_subscribed = await check_subscription(message.from_user.id)
         if is_subscribed:
-            data = KEYWORDS[keyword]
+            data = keywords[keyword]
             if data['path'] and os.path.exists(data['path']):
                 try:
                     with open(data['path'], 'rb') as file:

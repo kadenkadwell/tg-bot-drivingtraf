@@ -4,7 +4,7 @@ import logging
 import os
 import random
 import json
-from keep_alive import keep_alive
+import aiohttp
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -44,7 +44,6 @@ async def start_command(message: types.Message):
         "Я бот, который помогает получить полезные материалы по ключевым словам.\n"
         "Напиши ключевое слово из видео на нашем YouTube-канале.\n"
         f"Если ты не подписан на канал {CHANNEL_USERNAME}, я попрошу тебя подписаться.\n"
-        "Например, попробуй слово: девушка или промокод."
     )
     await message.answer(text)
 
@@ -60,15 +59,34 @@ async def keyword_handler(message: types.Message):
         is_subscribed = await check_subscription(message.from_user.id)
         if is_subscribed:
             data = keywords[keyword]
-            if data['path'] and os.path.exists(data['path']):
+            path = data['path']
+            caption = data['caption']
+            
+            # Проверка, является ли path URL
+            if path and (path.startswith('http://') or path.startswith('https://')):
                 try:
-                    with open(data['path'], 'rb') as file:
-                        await message.answer_document(file, caption=data['caption'])
+                    async with aiohttp.ClientSession() as session:
+                        async with session.head(path) as resp:
+                            content_type = resp.headers.get('Content-Type', '')
+                    # Проверяем, что это изображение
+                    if 'image' in content_type.lower():
+                        await message.answer_photo(photo=path, caption=caption)
+                    else:
+                        await message.answer_document(document=path, caption=caption)
                 except Exception as e:
-                    logging.error(f"Ошибка отправки файла: {e}")
-                    await message.answer("Ошибка при отправке файла. Попробуйте позже.")
+                    logging.error(f"Ошибка отправки по URL {path}: {e}")
+                    await message.answer(f"Ошибка отправки файла. {caption}")
+            elif path and os.path.exists(path):
+                # Локальный файл
+                try:
+                    with open(path, 'rb') as file:
+                        await message.answer_document(file, caption=caption)
+                except Exception as e:
+                    logging.error(f"Ошибка отправки файла {path}: {e}")
+                    await message.answer(f"Ошибка при отправке файла. {caption}")
             else:
-                await message.answer(data['caption'])
+                # Только текст
+                await message.answer(caption)
         else:
             await message.answer(
                 f"Похоже, вы не подписаны на канал {CHANNEL_USERNAME}.\n"

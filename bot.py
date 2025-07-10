@@ -1,6 +1,5 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command
-from aiogram.filters.content_types import ContentTypes
+from aiogram.filters import Command, ContentTypeFilter
 import logging
 import os
 import random
@@ -47,7 +46,7 @@ async def start_command(message: types.Message):
     )
     await message.answer(text)
 
-@dp.message(ContentTypes.TEXT)
+@dp.message(ContentTypeFilter(content_types=['text']))
 async def keyword_handler(message: types.Message):
     """Обработчик текстовых сообщений с ключевыми словами."""
     if message.text.startswith('/'):

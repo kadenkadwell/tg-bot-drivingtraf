@@ -1,9 +1,10 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils.executor import start_polling
+from aiogram.utils import executor
 import logging
 import os
 import random
 from keep_alive import keep_alive
+
 API_TOKEN = os.getenv('API_TOKEN')
 CHANNEL_USERNAME = '@drivingtraf'
 
@@ -56,7 +57,6 @@ async def keyword_handler(message: types.Message):
                     logging.error(f"Ошибка отправки файла: {e}")
                     await message.answer("Извините, возникла ошибка при отправке файла. Попробуйте позже.")
             else:
-                # Для промокода или если файла нет, просто отправляем текст
                 await message.answer(data['caption'])
         else:
             await message.answer(
@@ -75,4 +75,4 @@ async def keyword_handler(message: types.Message):
 
 if __name__ == '__main__':
     keep_alive()
-    start_polling(dp, skip_updates=True)
+    executor.start_polling(dp, skip_updates=True)

@@ -1,8 +1,7 @@
 services:
   - type: web
-    name: telegram-bot-drivingtraf
+    name: tg-bot-drivingtraf
     env: python
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: python3 bot.py
     pythonVersion: 3.11.9
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py

@@ -4,9 +4,11 @@ services:
     env: python
     plan: free
     region: oregon
-    pythonVersion: "3.11.9"
+    runtime: python311  # Явно указываем Python 3.11
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
     envVars:
       - key: PORT
         value: 8080
+      - key: PYTHON_VERSION
+        value: 3.11.9  # Дополнительно указываем версию Python

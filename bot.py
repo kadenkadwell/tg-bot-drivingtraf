@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command, Text
+from aiogram.filters import Command, ContentType
 import logging
 import os
 import random
@@ -46,7 +46,7 @@ async def send_welcome(message: types.Message):
     )
     await message.answer(text)
 
-@dp.message(Text)
+@dp.message(ContentType('text'))
 async def keyword_handler(message: types.Message):
     """Обработчик текстовых сообщений с ключевыми словами."""
     if message.text.startswith('/'):
@@ -69,7 +69,8 @@ async def keyword_handler(message: types.Message):
         else:
             await message.answer(
                 "Похоже, вы не подписаны на канал @drivingtraf.\n"
-                "Пожалуйста, подпишитесь, чтобы получить доступ к файлам:\n"
+                "Пожалуйста, подпишитесь, чтобы получить доступ к файлам:\ nitelik
+
                 "https://t.me/drivingtraf"
             )
     else:
